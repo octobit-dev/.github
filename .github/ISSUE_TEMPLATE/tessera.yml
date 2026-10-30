@@ -1,0 +1,38 @@
+name: Tessera request
+description: A need from the Tessera team (gdg-pw/tessera).
+labels: ["tessera"]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Need
+      description: What Tessera needs from the library, and which part uses it (worker, participant app, data pipeline).
+    validations:
+      required: true
+  - type: dropdown
+    id: channel
+    attributes:
+      label: Channel
+      options:
+        - crates.io
+        - npm
+        - PyPI
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (MoSCoW)
+      options:
+        - Must
+        - Should
+        - Could
+    validations:
+      required: true
+  - type: input
+    id: needed-by
+    attributes:
+      label: Needed by
+      description: Demo or date, for example "Demo 2, end of January 2027".
+    validations:
+      required: true
