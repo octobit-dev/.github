@@ -1,0 +1,77 @@
+name: Rust CI
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal --component rustfmt && rustup default stable
+      - run: cargo fmt --all --check
+
+  clippy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal --component clippy && rustup default stable
+      - run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - name: Docs
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --workspace --no-deps --all-features --locked
+
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal && rustup default stable
+      - run: cargo test --workspace --all-features --locked
+
+  wasm32:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal --target wasm32-unknown-unknown && rustup default stable
+      # Build only. Running tests on wasm32 needs a test runner, chosen together with the WASM build tool.
+      - run: cargo build --workspace --target wasm32-unknown-unknown --locked
+
+  licenses:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal && rustup default stable
+      - name: Install cargo-deny
+        env:
+          VERSION: 0.20.2
+          SHA256: 9f12ed4c49936e09b48bf862b595cde2fe64fcbd9d74dfacac6131ca824c8d5f
+        run: |
+          cd "$RUNNER_TEMP"
+          name="cargo-deny-${VERSION}-x86_64-unknown-linux-musl"
+          curl -sSfL -o cargo-deny.tar.gz "https://github.com/EmbarkStudios/cargo-deny/releases/download/${VERSION}/${name}.tar.gz"
+          echo "${SHA256}  cargo-deny.tar.gz" | sha256sum -c -
+          tar -xzf cargo-deny.tar.gz --strip-components=1 "${name}/cargo-deny"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - run: cargo deny --all-features check licenses
