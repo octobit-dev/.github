@@ -18,6 +18,6 @@ These rules apply in every repository, issue, pull request and discussion of the
 
 ## Enforcement
 
-Report a problem privately to the maintainers by email: TODO.
+To report a comment, issue or pull request, open its `...` menu and choose **Report content**.
 
-Reports stay confidential. Maintainers may edit or remove comments, lock threads, close issues and pull requests, and block people from the organization. The response depends on the problem: from a warning to a permanent ban.
+Maintainers may edit or remove comments, lock threads, close issues and pull requests, and block people from the organization. The response depends on the problem: from a warning to a permanent ban.
